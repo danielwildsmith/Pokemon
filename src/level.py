@@ -1,4 +1,5 @@
-import pygame.display
+import pygame
+from player import Player
 
 
 class Level:
@@ -8,5 +9,10 @@ class Level:
         self.map_image = pygame.image.load('../graphics/Pokemon Town.png')
         self.map_rect = self.map_image.get_rect()
 
+        self.visible_sprites = pygame.sprite.Group()
+        self.player = Player((0, 0), [self.visible_sprites])
+
     def run(self):
         self.display_surface.blit(self.map_image, self.map_rect)
+        self.visible_sprites.draw(self.display_surface)
+        self.visible_sprites.update()

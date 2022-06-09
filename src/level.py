@@ -6,12 +6,11 @@ from tile import Tile
 
 class Level:
     def __init__(self):
-        self.display_surface = pygame.display.get_surface() \
-            # TODO: import only ground layer. Then use a create_map function with groups to draw the rest.
+        self.display_surface = pygame.display.get_surface()
         self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = pygame.sprite.Group()
 
-        self.player = Player((815, 840), [self.visible_sprites], self.obstacle_sprites)
+        self.player = Player((815, 860), [self.visible_sprites], self.obstacle_sprites)
 
         self.create_map()
 

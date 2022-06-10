@@ -2,21 +2,27 @@ import pygame
 from settings import *
 from player import Player
 from tile import Tile
+from battle import Battle
+from random import randint
 
 
 class Level:
     def __init__(self):
         self.display_surface = pygame.display.get_surface()
         self.visible_sprites = YSortCameraGroup()
-        self.obstacle_sprites = pygame.sprite.Group()
+        self.invisible_sprites = pygame.sprite.Group()
 
-        self.player = Player((815, 860), [self.visible_sprites], self.obstacle_sprites)
+        self.player = Player((815, 860), [self.visible_sprites], self.invisible_sprites)
 
         self.create_map()
 
+        self.battle_spawn_timer = pygame.USEREVENT + 1
+        pygame.time.set_timer(self.battle_spawn_timer, 1000)
+
     def create_map(self):
         layouts = {
-            'boundary': import_csv_layout('../map/map_boundaries.csv')
+            'boundary': import_csv_layout('../map/map_boundaries.csv'),
+            'wild_areas': import_csv_layout('../map/map_wild_areas.csv')
         }
         for style, layout in layouts.items():
             for row_index, row in enumerate(layout):
@@ -25,11 +31,22 @@ class Level:
                         x = col_index * TILESIZE
                         y = row_index * TILESIZE
                         if style == 'boundary':
-                            Tile((x, y), [self.obstacle_sprites], 'invisible')
+                            Tile((x, y), [self.invisible_sprites], 'boundary')
+                        if style == 'wild_areas':
+                            Tile((x, y), [self.invisible_sprites], 'wild_area')
+
+    def battle_spawn(self):
+        if self.player.in_wild_area():
+            if self.battle_spawn_timer:
+                if randint(1, 85) == 5:
+                    battle = Battle()
+                    battle.display()
 
     def run(self):
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
+
+        self.battle_spawn()
 
 
 class YSortCameraGroup(pygame.sprite.Group):

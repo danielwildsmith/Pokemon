@@ -1,9 +1,10 @@
 import pygame
 from settings import *
+from random import randint
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, group, obstacle_sprites):
+    def __init__(self, pos, group, invisible_sprites):
         super().__init__(group)
         self.image = pygame.image.load('../graphics/player/down/0.png')
         self.image = pygame.transform.scale(self.image, (90, 90))
@@ -15,7 +16,7 @@ class Player(pygame.sprite.Sprite):
         self.frame_index = 0
         self.animation_speed = 0.15
 
-        self.obstacle_sprites = obstacle_sprites
+        self.invisible_sprites = invisible_sprites
 
         self.animations = self.import_player_animations()
 
@@ -51,19 +52,25 @@ class Player(pygame.sprite.Sprite):
 
     def collision(self, direction):
         if direction == 'horizontal':
-            for sprite in self.obstacle_sprites:
-                if sprite.rect.colliderect(self.hitbox):
+            for sprite in self.invisible_sprites:
+                if sprite.sprite_type == 'boundary' and sprite.rect.colliderect(self.hitbox):
                     if self.direction.x > 0:
                         self.hitbox.right = sprite.rect.left
                     if self.direction.x < 0:
                         self.hitbox.left = sprite.rect.right
         if direction == 'vertical':
-            for sprite in self.obstacle_sprites:
-                if sprite.rect.colliderect(self.hitbox):
+            for sprite in self.invisible_sprites:
+                if sprite.sprite_type == 'boundary' and sprite.rect.colliderect(self.hitbox):
                     if self.direction.y > 0:
                         self.hitbox.bottom = sprite.rect.top
                     if self.direction.y < 0:
                         self.hitbox.top = sprite.rect.bottom
+
+    def in_wild_area(self):
+        for sprite in self.invisible_sprites:
+            if sprite.sprite_type == 'wild_area' and sprite.rect.colliderect(self.hitbox):
+                return True
+        return False
 
     def import_player_animations(self):
         player_path = '../graphics/player/'
@@ -86,7 +93,6 @@ class Player(pygame.sprite.Sprite):
             self.image = animation[int(self.frame_index)]
         self.image = pygame.transform.scale(self.image, (90, 90))
         self.rect = self.image.get_rect(center=self.hitbox.center)
-
 
     def update(self):
         self.input()

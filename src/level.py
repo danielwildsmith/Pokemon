@@ -1,4 +1,3 @@
-import pygame
 from settings import *
 from player import Player
 from tile import Tile
@@ -18,6 +17,8 @@ class Level:
 
         self.battle_spawn_timer = pygame.USEREVENT + 1
         pygame.time.set_timer(self.battle_spawn_timer, 1000)
+        self.battle = Battle()
+        self.battle_sequence = False
 
     def create_map(self):
         layouts = {
@@ -39,14 +40,15 @@ class Level:
         if self.player.in_wild_area():
             if self.battle_spawn_timer:
                 if randint(1, 85) == 5:
-                    battle = Battle()
-                    battle.display()
+                    self.battle_sequence = True
 
     def run(self):
-        self.visible_sprites.custom_draw(self.player)
-        self.visible_sprites.update()
-
-        self.battle_spawn()
+        if self.battle_sequence:
+            self.battle.display()
+        else:
+            self.visible_sprites.custom_draw(self.player)
+            self.visible_sprites.update()
+            self.battle_spawn()
 
 
 class YSortCameraGroup(pygame.sprite.Group):
@@ -59,7 +61,7 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.offset = pygame.math.Vector2(100, 200)
 
         # creating the map
-        self.map_image = pygame.image.load('../graphics/Pokemon Town.png')
+        self.map_image = pygame.image.load('../graphics/background/Pokemon Town.png')
         self.map_rect = self.map_image.get_rect()
 
     def custom_draw(self, player):

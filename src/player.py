@@ -1,6 +1,4 @@
-import pygame
 from settings import *
-from random import randint
 
 
 class Player(pygame.sprite.Sprite):

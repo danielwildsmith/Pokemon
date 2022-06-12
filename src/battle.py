@@ -1,39 +1,50 @@
-import pygame
 from settings import *
-from pokemon import Pokemon
 
 
 class Battle:
+    # TODO: implement a function for displaying the entity's information
     def __init__(self):
         self.display_surface = pygame.display.get_surface()
         self.font = pygame.font.Font(FONT, FONT_SIZE)
-        self.battle_background_surf = pygame.image.load('../graphics/background/battle_background.png').convert()
-        self.battle_background_surf = pygame.transform.scale(self.battle_background_surf, (WIDTH, HEIGHT - 200))
-        self.battle_background_rect = self.battle_background_surf.get_rect(midtop=(WIDTH / 2, 0))
 
-        self.pokemon_sprites = pygame.sprite.Group()
-        pikachu = Pokemon('pikachu', (350, 575), self.pokemon_sprites)
-        eevee = Pokemon('eevee', (950, 350), self.pokemon_sprites)
+        self.items = self.create_items()
 
-        self.pikachu_UI = PokemonUI(700, 575, 200, 100, self.font)
+    def create_items(self):
+        items = {
+            'dialogue': BattleUI(0, HEIGHT - 150, WIDTH / 2, 150, self.font, BATTLE_UI_BG_COLOR),
+            'entity': BattleUI(WIDTH - 400, HEIGHT - 300, 350, 100, self.font, BATTLE_UI_BG_COLOR),
+            'option_1': BattleUI(WIDTH / 2 + 15, HEIGHT - 150, WIDTH / 4 - 30, 65, self.font, BATTLE_UI_BG_COLOR),
+            'option_2': BattleUI(WIDTH * 0.75 + 15, HEIGHT - 150, WIDTH / 4 - 30, 65, self.font, BATTLE_UI_BG_COLOR),
+            'option_3': BattleUI(WIDTH / 2 + 15, HEIGHT - 75, WIDTH / 4 - 30, 65, self.font, BATTLE_UI_BG_COLOR),
+            'option_4': BattleUI(WIDTH * 0.75 + 15, HEIGHT - 75, WIDTH / 4 - 30, 65, self.font, BATTLE_UI_BG_COLOR)
+            # TODO: display enemy UI
+        }
+
+        return items
+
+    def create_scene(self):
+        # TODO: add platforms, maybe try your hand at pixel art
+        self.display_surface.fill(GRASS_BG_COLOR)
 
     def display(self):
-        self.display_surface.blit(self.battle_background_surf, self.battle_background_rect)
-        self.pokemon_sprites.draw(self.display_surface)
-        self.pikachu_UI.display(self.display_surface, 'pikachu')
+        self.create_scene()
+        for item in self.items.values():
+            item.display_rect(self.display_surface)
 
 
-class PokemonUI:
-    def __init__(self, left, top, width, height, font):
+class BattleUI:
+    # TODO: Implement a method for a health bar
+    def __init__(self, left, top, width, height, font, color, text=None):
         self.rect = pygame.Rect(left, top, width, height)
         self.font = font
+        self.text = text if text else None
+        self.color = color
 
-    def display_info(self, surface, name):
-        pokemon_name_surf = self.font.render(name, False, BATTLE_UI_BORDER_TEXT_COLOR)
-        pokemon_name_rect = pokemon_name_surf.get_rect(topleft=self.rect.topleft + pygame.math.Vector2(30, 30))
-        surface.blit(pokemon_name_surf, pokemon_name_rect)
-
-    def display(self, surface, name):
-        pygame.draw.rect(surface, BATTLE_UI_BG_COLOR, self.rect)
-        pygame.draw.rect(surface, BATTLE_UI_BORDER_TEXT_COLOR, self.rect, 4)
-        self.display_info(surface, name)
+    def display_rect(self, surface):
+        if not self.text:
+            pygame.draw.rect(surface, self.color, self.rect)
+            pygame.draw.rect(surface, BATTLE_UI_BORDER_TEXT_COLOR, self.rect, 4)
+        else:
+            text_surf = self.font.render(self.text, False, BATTLE_UI_BORDER_TEXT_COLOR)
+            text_rect = text_surf.get_rect(center=self.rect.center)
+            surface.blit(text_surf, text_rect)

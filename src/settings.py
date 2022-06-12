@@ -36,3 +36,5 @@ pokemon_data = {
 
 BATTLE_UI_BG_COLOR = pygame.color.Color(186, 188, 191)
 BATTLE_UI_BORDER_TEXT_COLOR = pygame.color.Color(75, 75, 75)
+
+GRASS_BG_COLOR = pygame.color.Color(180, 217, 190)

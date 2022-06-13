@@ -17,7 +17,7 @@ class Level:
 
         self.battle_spawn_timer = pygame.USEREVENT + 1
         pygame.time.set_timer(self.battle_spawn_timer, 1000)
-        self.battle = Battle()
+        self.battle = Battle(self.player)
         self.battle_sequence = True
 
     def create_map(self):

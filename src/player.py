@@ -18,6 +18,8 @@ class Player(pygame.sprite.Sprite):
 
         self.animations = self.import_player_animations()
 
+        self.entities = ['slime']
+
     def input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_DOWN]:

@@ -1,5 +1,5 @@
 from settings import *
-
+from random import choice
 
 class Entity(pygame.sprite.Sprite):
     def __init__(self, entity_name, pos, group):
@@ -12,3 +12,10 @@ class Entity(pygame.sprite.Sprite):
         self.health = entity_data[entity_name]['health']
         self.damage = entity_data[entity_name]['damage']
         self.moveset = entity_data[entity_name]['moveset']
+
+    def attack(self, given_attack_index=-1):
+        if given_attack_index != -1:
+            attack = self.moveset[given_attack_index]
+        else:
+            attack = choice(self.moveset)
+        return f'{self.name} used {attack}!'

@@ -37,6 +37,7 @@ entity_data = {
 }
 
 DEFAULT_BORDER_COLOR = pygame.color.Color(75, 75, 75)
+SELECTED_BORDER_COLOR = pygame.color.Color('gold')
 DIALOGUE_BG_COLOR = pygame.color.Color(77, 129, 138)
 DIALOGUE_BORDER_COLOR = pygame.color.Color(184, 91, 81)
 DIALOGUE_TEXT_COLOR = pygame.color.Color(230, 234, 235)

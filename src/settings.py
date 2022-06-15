@@ -47,6 +47,7 @@ MOVESET_TEXT_COLOR = pygame.color.Color(43, 45, 46)
 
 ENTITY_UI_BG_COLOR = pygame.color.Color(230, 241, 242)
 ENTITY_UI_BORDER_COLOR = pygame.color.Color(75, 75, 75)
+ENTITY_HEALTH_BAR_COLOR = pygame.color.Color(96, 219, 88)
 
 GRASS_BG_COLOR = pygame.color.Color(180, 217, 190)
 GRASS_PLATFORM_COLOR = pygame.color.Color(126, 194, 97)

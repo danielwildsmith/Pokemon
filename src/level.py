@@ -45,6 +45,8 @@ class Level:
     def run(self):
         if self.battle_sequence:
             self.battle.display()
+            if not self.battle.display():
+                self.battle_sequence = False
         else:
             self.visible_sprites.custom_draw(self.player)
             self.visible_sprites.update()

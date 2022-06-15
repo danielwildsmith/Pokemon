@@ -8,6 +8,7 @@ class Battle:
     def __init__(self, player):
         self.display_surface = pygame.display.get_surface()
         self.font = pygame.font.Font(FONT, FONT_SIZE)
+        self.battle_state = True
 
         self.entity_group = pygame.sprite.Group()
         self.player_entity = Entity(player.entities[0], (275, HEIGHT - 250), self.entity_group)
@@ -48,6 +49,8 @@ class Battle:
                     self.dialogue = self.player_entity.attack(0)
                 self.dialogue = self.player_entity.attack(self.selection_index)
                 self.items['dialogue'].text = self.dialogue
+            if self.selection_index == 3:
+                self.battle_state = False
 
                 # TODO: Enemy entity timer
                 # self.dialogue = self.enemy_entity.attack()
@@ -57,8 +60,14 @@ class Battle:
         items = {
             'dialogue': BattleUI(0, HEIGHT - 150, WIDTH / 2, 150, self.font, DIALOGUE_BG_COLOR, DIALOGUE_BORDER_COLOR,
                                  text_color=DIALOGUE_TEXT_COLOR, text=text, type='dialogue'),
-            'player_entity': BattleUI(WIDTH / 2 + 45, HEIGHT - 350, 550, 135, self.font, ENTITY_UI_BG_COLOR),
-            'enemy_entity': BattleUI(65, 75, 525, 135, self.font, ENTITY_UI_BG_COLOR),
+            'player_entity': BattleUI(WIDTH / 2 + 45, HEIGHT - 350, 550, 135, self.font, ENTITY_UI_BG_COLOR,
+                                      text=self.player_entity.name, text_color=MOVESET_TEXT_COLOR, type='entity'),
+            'enemy_entity': BattleUI(65, 75, 525, 100, self.font, ENTITY_UI_BG_COLOR, text=self.enemy_entity.name,
+                                     text_color=MOVESET_TEXT_COLOR, type='entity'),
+            'player_health_bar': BattleUI(WIDTH / 2 + 145, HEIGHT - 290, 430, 20, self.font, ENTITY_HEALTH_BAR_COLOR,
+                                          text_color=DIALOGUE_BORDER_COLOR, type='player_health_bar'),
+            'enemy_health_bar': BattleUI(65 + 100, 75 + 65, 405, 20, self.font, ENTITY_HEALTH_BAR_COLOR,
+                                         text_color=DIALOGUE_BORDER_COLOR, type='enemy_health_bar'),
             'option_0': BattleUI(WIDTH / 2 + 15, HEIGHT - 150, WIDTH / 4 - 30, 65, self.font, MOVESET_BG_COLOR,
                                  text=self.player_entity.moveset[0], text_color=MOVESET_TEXT_COLOR, index=0),
             'option_1': BattleUI(WIDTH * 0.75 + 15, HEIGHT - 150, WIDTH / 4 - 30, 65, self.font, MOVESET_BG_COLOR,
@@ -67,7 +76,6 @@ class Battle:
                                  text=self.player_entity.moveset[2], text_color=MOVESET_TEXT_COLOR, index=2),
             'option_3': BattleUI(WIDTH * 0.75 + 15, HEIGHT - 75, WIDTH / 4 - 30, 65, self.font, MOVESET_BG_COLOR,
                                  text='Run', text_color=MOVESET_TEXT_COLOR, index=3)
-            # TODO: display enemy UI
         }
 
         return items
@@ -88,13 +96,20 @@ class Battle:
     def display(self):
         self.create_scene()
         for item in self.items.values():
-            item.display_rect(self.display_surface, self.selection_index)
+            if item.type and 'health_bar' in item.type:
+                current_health = self.player_entity.health if 'player' in item.type else self.enemy_entity.health
+                max_health = entity_data[self.player_entity.name]['health'] if 'player' in item.type else entity_data[self.enemy_entity.name]['health']
+                item.display_health_bar(self.display_surface, current_health, max_health)
+            else:
+                item.display_rect(self.display_surface, self.selection_index)
+
         self.entity_group.draw(self.display_surface)
         self.input()
 
+        return self.battle_state
+
 
 class BattleUI:
-    # TODO: Implement a method for a health bar
     def __init__(self, left, top, width, height, font, color, border_color=None, text=None, text_color=None, type=None, index=None):
         self.rect = pygame.Rect(left, top, width, height)
         self.font = font
@@ -117,8 +132,28 @@ class BattleUI:
 
         if self.text:
             text_surf = self.font.render(self.text, False, self.text_color)
-            if self.type == 'dialogue':
+            if self.type == 'dialogue' or self.type == 'entity':
                 text_rect = text_surf.get_rect(topleft=self.rect.topleft + pygame.math.Vector2(15, 15))
             else:
                 text_rect = text_surf.get_rect(center=self.rect.center)
+            surface.blit(text_surf, text_rect)
+
+    def display_health_bar(self, surface, current_health, max_health):
+        pygame.draw.rect(surface, ENTITY_UI_BG_COLOR, self.rect)
+        ratio = current_health / max_health
+        current_health_rect_width = self.rect.width * ratio
+        current_health_rect = self.rect.copy()
+        current_health_rect.width = current_health_rect_width
+
+        pygame.draw.rect(surface, ENTITY_HEALTH_BAR_COLOR, current_health_rect)
+        pygame.draw.rect(surface, ENTITY_UI_BORDER_COLOR, self.rect, 4)
+
+        hp_surf = self.font.render('HP', False, self.text_color)
+        hp_rect = hp_surf.get_rect(midright=self.rect.midleft)
+        pygame.draw.rect(surface, ENTITY_UI_BORDER_COLOR, hp_rect)
+        surface.blit(hp_surf, hp_rect)
+
+        if self.type and 'player' in self.type:
+            text_surf = self.font.render(f'{current_health} / {max_health}', False, MOVESET_TEXT_COLOR)
+            text_rect = text_surf.get_rect(topright=self.rect.bottomright + pygame.math.Vector2(0, 10))
             surface.blit(text_surf, text_rect)

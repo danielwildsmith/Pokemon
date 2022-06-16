@@ -15,10 +15,8 @@ class Level:
 
         self.create_map()
 
-        self.battle_spawn_timer = pygame.USEREVENT + 1
-        pygame.time.set_timer(self.battle_spawn_timer, 1000)
         self.battle = Battle(self.player)
-        self.battle_sequence = True
+        self.battle_sequence = False
 
     def create_map(self):
         layouts = {
@@ -38,15 +36,15 @@ class Level:
 
     def battle_spawn(self):
         if self.player.in_wild_area():
-            if self.battle_spawn_timer:
-                if randint(1, 85) == 5:
-                    self.battle_sequence = True
+            if randint(1, 150) == 8:
+                self.battle_sequence = True
 
     def run(self):
         if self.battle_sequence:
-            self.battle.display()
-            if not self.battle.display():
+            self.battle.update()
+            if not self.battle.update():
                 self.battle_sequence = False
+                self.battle = Battle(self.player)
         else:
             self.visible_sprites.custom_draw(self.player)
             self.visible_sprites.update()

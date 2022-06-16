@@ -19,6 +19,12 @@ class Battle:
 
         self.selection_index = 0
 
+        self.message_display_time = None
+        self.can_display_new_message = True
+        self.message_display_cooldown = 1500
+        self.player_turn = True
+        self.additional_cooldown_run = 0
+
     def input(self):
         keys = pygame.key.get_pressed()
 
@@ -43,13 +49,13 @@ class Battle:
             elif keys[pygame.K_UP]:
                 self.selection_index = 1
 
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and self.can_display_new_message and self.player_turn:
+            self.player_turn = False
+
             if 0 <= self.selection_index <= 2:
-                if self.selection_index == 0:
-                    self.dialogue = self.player_entity.attack(0)
-                self.dialogue = self.player_entity.attack(self.selection_index)
-                self.items['dialogue'].text = self.dialogue
+                self.update_dialogue(self.player_entity.attack(self.enemy_entity, self.selection_index))
             if self.selection_index == 3:
+                self.update_dialogue(f'{self.player_entity.name} ran away!')
                 self.battle_state = False
 
                 # TODO: Enemy entity timer
@@ -90,23 +96,57 @@ class Battle:
         pygame.draw.ellipse(self.display_surface, GRASS_PLATFORM_COLOR, platform_two)
         pygame.draw.ellipse(self.display_surface, GRASS_PLATFORM_BORDER_COLOR, platform_two, 8)
 
-    def dialogue_cooldown(self):
-        pass
+    def cooldowns(self, game_over_cooldown=False):
+        current_time = pygame.time.get_ticks()
+
+        if game_over_cooldown:
+            if current_time - self.message_display_time >= self.message_display_cooldown:
+                print('WHU')
+                return False
+
+        if not self.can_display_new_message and self.battle_state:
+            if current_time - self.message_display_time >= self.message_display_cooldown:
+                self.can_display_new_message = True
+                if not self.player_turn:
+                    self.update_dialogue(self.enemy_entity.attack(self.player_entity))
+                    self.player_turn = True
+        return True
+
+    def check_battle_over(self):
+        if self.enemy_entity.health <= 0:
+            self.update_dialogue(f'{self.player_entity.name} defeated {self.enemy_entity.name}!')
+            self.battle_state = False
+        elif self.player_entity.health <= 0:
+            self.update_dialogue(f'{self.enemy_entity.name} defeated {self.player_entity.name}!')
+            self.battle_state = False
+
+    def update_dialogue(self, text):
+        self.message_display_time = pygame.time.get_ticks()
+        if self.can_display_new_message:
+            self.items['dialogue'].text = text
+            self.can_display_new_message = False
 
     def display(self):
         self.create_scene()
         for item in self.items.values():
             if item.type and 'health_bar' in item.type:
-                current_health = self.player_entity.health if 'player' in item.type else self.enemy_entity.health
+                current_health = int(self.player_entity.health if 'player' in item.type else self.enemy_entity.health)
                 max_health = entity_data[self.player_entity.name]['health'] if 'player' in item.type else entity_data[self.enemy_entity.name]['health']
                 item.display_health_bar(self.display_surface, current_health, max_health)
             else:
                 item.display_rect(self.display_surface, self.selection_index)
 
         self.entity_group.draw(self.display_surface)
-        self.input()
 
-        return self.battle_state
+    def update(self):
+        self.display()
+        if not self.battle_state:
+            return self.cooldowns(True)
+        else:
+            self.input()
+            self.cooldowns()
+            self.check_battle_over()
+        return True
 
 
 class BattleUI:

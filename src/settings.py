@@ -32,7 +32,7 @@ FONT_SIZE = 18
 entity_data = {
     'slime': {'health': 20, 'damage': 5, 'moveset': ['Tackle', 'Taunt', 'Slime Shot'],
               'image': '../graphics/entities/slime/back.png'},
-    'snake': {'health': 10, 'damage': 4, 'moveset': ['Bite', 'Hiss', 'Constrict'],
+    'snake': {'health': 15, 'damage': 5, 'moveset': ['Bite', 'Hiss', 'Constrict'],
               'image': '../graphics/entities/snake/face.png'}
 }
 

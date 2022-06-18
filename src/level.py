@@ -32,7 +32,11 @@ class Level:
                         if style == 'boundary':
                             Tile((x, y), [self.invisible_sprites], 'boundary')
                         if style == 'wild_areas':
-                            Tile((x, y), [self.invisible_sprites], 'wild_area')
+                            id = int(col)
+                            if 306 <= id <= 308 or 338 <= id <= 340 or 370 <= id <= 372:
+                                Tile((x, y), [self.invisible_sprites], 'wild_area', 'grass')
+                            elif 438 <= id <= 440 or 470 <= id <= 472 or 502 <= id <= 504:
+                                Tile((x, y), [self.invisible_sprites], 'wild_area', 'water')
 
     def battle_spawn(self):
         if self.player.in_wild_area():

@@ -69,8 +69,11 @@ class Player(pygame.sprite.Sprite):
     def in_wild_area(self):
         for sprite in self.invisible_sprites:
             if sprite.sprite_type == 'wild_area' and sprite.rect.colliderect(self.hitbox):
-                return True
-        return False
+                if sprite.wild_area_type == 'grass':
+                    return 'grass'
+                elif sprite.wild_area_type == 'water':
+                    return 'water'
+        return None
 
     def import_player_animations(self):
         player_path = '../graphics/player/'

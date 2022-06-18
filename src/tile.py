@@ -2,8 +2,9 @@ from settings import *
 
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, sprite_type, surface=pygame.Surface((TILESIZE, TILESIZE))):
+    def __init__(self, pos, groups, sprite_type, grass_or_water=None, surface=pygame.Surface((TILESIZE, TILESIZE))):
         super().__init__(groups)
         self.sprite_type = sprite_type
+        self.wild_area_type = grass_or_water
         self.image = surface
         self.rect = self.image.get_rect(topleft=pos)

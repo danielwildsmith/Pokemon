@@ -9,10 +9,12 @@ class Battle:
         self.display_surface = pygame.display.get_surface()
         self.font = pygame.font.Font(FONT, FONT_SIZE)
         self.battle_state = True
+        self.player = player
 
         self.entity_group = pygame.sprite.Group()
         self.player_entity = Entity(player.entities[0], (275, HEIGHT - 250), self.entity_group)
-        self.enemy_entity = Entity('snake', (WIDTH - 325, 190), self.entity_group)
+        enemy_entity_name = 'snake' if self.player.in_wild_area() == 'grass' else 'reptile'
+        self.enemy_entity = Entity(enemy_entity_name, (WIDTH - 325, 190), self.entity_group)
 
         self.dialogue = f'A wild {self.enemy_entity.name} appeared!'
         self.items = self.create_items(self.dialogue)
@@ -86,15 +88,15 @@ class Battle:
 
         return items
 
-    def create_scene(self):
-        self.display_surface.fill(GRASS_BG_COLOR)
+    def create_scene(self, env_type):
+        self.display_surface.fill(env_colors[env_type + '_BG_COLOR'])
         platform_one = pygame.Rect(-100, HEIGHT - 250, 700, 200)
-        pygame.draw.ellipse(self.display_surface, GRASS_PLATFORM_COLOR, platform_one)
-        pygame.draw.ellipse(self.display_surface, GRASS_PLATFORM_BORDER_COLOR, platform_one, 8)
+        pygame.draw.ellipse(self.display_surface, env_colors[env_type + '_PLATFORM_COLOR'], platform_one)
+        pygame.draw.ellipse(self.display_surface, env_colors[env_type + '_PLATFORM_BORDER_COLOR'], platform_one, 8)
 
         platform_two = pygame.Rect(WIDTH / 2 + 50, 150, 550, 165)
-        pygame.draw.ellipse(self.display_surface, GRASS_PLATFORM_COLOR, platform_two)
-        pygame.draw.ellipse(self.display_surface, GRASS_PLATFORM_BORDER_COLOR, platform_two, 8)
+        pygame.draw.ellipse(self.display_surface, env_colors[env_type + '_PLATFORM_COLOR'], platform_two)
+        pygame.draw.ellipse(self.display_surface, env_colors[env_type + '_PLATFORM_BORDER_COLOR'], platform_two, 8)
 
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
@@ -118,14 +120,17 @@ class Battle:
 
     def update_dialogue(self, text):
         if self.can_display_new_message and not self.final_dialogue_printed:
-            if 'defeated' in text:
+            if 'defeated' in text or 'ran away!' in text:
                 self.final_dialogue_printed = True
                 self.message_display_time = pygame.time.get_ticks()
             self.items['dialogue'].text = text
             self.can_display_new_message = False
 
     def display(self):
-        self.create_scene()
+        if self.player.in_wild_area():
+            self.create_scene(self.player.in_wild_area().upper())
+        else:
+            self.create_scene('GRASS')
         for item in self.items.values():
             if item.type and 'health_bar' in item.type:
                 current_health = int(self.player_entity.health if 'player' in item.type else self.enemy_entity.health)

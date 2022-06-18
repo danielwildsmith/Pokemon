@@ -3,6 +3,7 @@ from csv import reader
 from os import walk
 
 
+# File reading method taken from ClearCode's Zelda Game Tutorial
 def import_csv_layout(path):
     terrain_map = []
     with open(path) as level_map:
@@ -12,6 +13,7 @@ def import_csv_layout(path):
         return terrain_map
 
 
+# File reading method taken from ClearCode's Zelda Game Tutorial
 def import_folder(path):
     surface_list = []
     for _, __, image_files in walk(path):

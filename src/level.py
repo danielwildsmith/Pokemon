@@ -51,6 +51,7 @@ class Level:
             self.battle_spawn()
 
 
+# class inspired by ClearCode's YT tutorial on YSortCameras
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
         # general setup

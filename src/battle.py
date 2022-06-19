@@ -1,7 +1,7 @@
 import pygame.sprite
-
 from settings import *
 from entity import Entity
+from particles import ParticleAnimationPlayer
 
 
 class Battle:
@@ -29,6 +29,8 @@ class Battle:
         # used for delay after the game is over. Had to use for cooldown to work properly
         self.final_dialogue_printed = False
 
+        self.particle_animation_player = ParticleAnimationPlayer()
+
     def input(self):
         keys = pygame.key.get_pressed()
 
@@ -54,15 +56,27 @@ class Battle:
                 self.selection_index = 1
 
         if keys[pygame.K_SPACE] and self.can_display_new_message and self.player_turn:
-            self.player_turn = False
-
-            if 0 <= self.selection_index <= 2:
-                self.message_display_time = pygame.time.get_ticks()
-                self.update_dialogue(self.player_entity.attack(self.enemy_entity, self.selection_index))
+            # check if ran away first
             if self.selection_index == 3:
                 self.message_display_time = pygame.time.get_ticks()
                 self.update_dialogue(f'{self.player_entity.name} ran away!')
                 self.battle_state = False
+            else:
+                self.player_turn = False
+                self.message_display_time = pygame.time.get_ticks()
+                particle_pos = self.enemy_entity.rect.center
+                if self.selection_index == 0:
+                    move_type = 'slash'
+                    self.update_dialogue(self.player_entity.attack(self.enemy_entity, self.selection_index)[1])
+                elif self.selection_index == 1:
+                    move_type = 'heal'
+                    self.update_dialogue(self.player_entity.heal())
+                    particle_pos = self.player_entity.rect.center
+                elif self.selection_index == 2:
+                    move_type = 'thunder'
+                    self.update_dialogue(self.player_entity.attack(self.enemy_entity, self.selection_index)[1])
+
+                self.particle_animation_player.create_particles(move_type, particle_pos, self.entity_group)
 
     def create_items(self, text):
         items = {
@@ -104,9 +118,13 @@ class Battle:
         if not self.can_display_new_message:
             if current_time - self.message_display_time >= self.message_display_cooldown:
                 self.can_display_new_message = True
+                # enemy attack
                 if not self.player_turn and self.battle_state:
                     self.message_display_time = pygame.time.get_ticks()
-                    self.update_dialogue(self.enemy_entity.attack(self.player_entity))
+                    attack_returns = self.enemy_entity.attack(self.player_entity)
+                    self.update_dialogue(attack_returns[1])
+                    particle_pos = self.enemy_entity.rect.center if attack_returns[0] == 'stat_move' else self.player_entity.rect.center
+                    self.particle_animation_player.create_particles(attack_returns[0], particle_pos, self.entity_group)
                     self.player_turn = True
         return True
 
@@ -145,6 +163,7 @@ class Battle:
         self.display()
         self.input()
         self.cooldowns()
+        self.entity_group.update()
 
         if not self.battle_state:
             self.update_dialogue(self.dialogue)

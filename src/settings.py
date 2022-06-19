@@ -32,11 +32,11 @@ FONT = '../graphics/font/joystix.ttf'
 FONT_SIZE = 18
 
 entity_data = {
-    'slime': {'health': 20, 'damage': 5, 'moveset': ['Tackle', 'Taunt', 'Slime Shot'],
+    'slime': {'health': 20, 'damage': 5, 'moveset': ['Tackle', 'Heal', 'Thunderbolt'],
               'image': '../graphics/entities/slime/back.png'},
-    'snake': {'health': 15, 'damage': 5, 'moveset': ['Bite', 'Hiss', 'Constrict'],
+    'snake': {'health': 15, 'damage': 5, 'moveset': ['Bite', 'Hiss'],
               'image': '../graphics/entities/snake/face.png'},
-    'reptile': {'health': 15, 'damage': 5, 'moveset': ['Water Gun', 'Aqua Tail', 'Rain Dance'],
+    'reptile': {'health': 15, 'damage': 5, 'moveset': ['Quick Attack', 'Focus'],
                 'image': '../graphics/entities/reptile/face.png'}
 }
 

@@ -35,7 +35,7 @@ class Entity(pygame.sprite.Sprite):
             target_entity.vulnerable = False
             additional_info = ''
         else:
-            self.attack += 3
+            self.damage += 3
             additional_info = 'Its stats increased!'
         return attack_type, f'{self.name} used {attack}! {additional_info}'
 

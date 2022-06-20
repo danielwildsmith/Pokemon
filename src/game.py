@@ -3,6 +3,8 @@ from sys import exit
 from level import Level
 
 
+# all music and entity images from Ninja Boy's Adventure Asset Pack
+# Map created using Tiled with the assets from https://cypor.itch.io/12x12-rpg-tileset
 class Game:
     def __init__(self):
         pygame.init()

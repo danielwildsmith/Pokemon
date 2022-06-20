@@ -3,6 +3,7 @@ from player import Player
 from tile import Tile
 from battle import Battle
 from random import randint
+from math import sin
 
 
 class Level:
@@ -17,6 +18,12 @@ class Level:
 
         self.battle = Battle(self.player)
         self.battle_sequence = False
+
+        self.game_sound = pygame.mixer.Sound('../audio/game_overworld.ogg')
+        self.game_sound.set_volume(0.5)
+        self.game_sound.play(-1)
+
+        self.encounter_sound = pygame.mixer.Sound('../audio/encounter.wav')
 
     def create_map(self):
         layouts = {
@@ -41,12 +48,15 @@ class Level:
     def battle_spawn(self):
         if self.player.in_wild_area():
             if randint(1, 150) == 8:
+                self.encounter_sound.play()
                 self.battle_sequence = True
 
     def run(self):
         if self.battle_sequence:
-            self.battle.update()
+            self.game_sound.stop()
             if not self.battle.update():
+                pygame.mixer.music.stop()
+                self.game_sound.play()
                 self.battle_sequence = False
                 self.battle = Battle(self.player)
         else:

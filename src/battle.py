@@ -19,7 +19,15 @@ class Battle:
         self.dialogue = f'A wild {self.enemy_entity.name} appeared!'
         self.items = self.create_items(self.dialogue)
 
+        pygame.mixer.music.load('../audio/battle.ogg')
+        pygame.mixer.music.set_volume(0)
+        pygame.mixer.music.play(-1)
+
         self.selection_index = 0
+        self.change_selection_sound = pygame.mixer.Sound('../audio/change_selection.wav')
+        self.change_selection_sound.set_volume(20)
+        self.select_sound = pygame.mixer.Sound('../audio/select.wav')
+        self.select_sound.set_volume(20)
 
         self.message_display_time = None
         self.can_display_new_message = True
@@ -37,25 +45,34 @@ class Battle:
         if self.selection_index == 0:
             if keys[pygame.K_DOWN]:
                 self.selection_index = 2
+                self.change_selection_sound.play()
             elif keys[pygame.K_RIGHT]:
                 self.selection_index = 1
+                self.change_selection_sound.play()
         elif self.selection_index == 1:
             if keys[pygame.K_LEFT]:
                 self.selection_index = 0
+                self.change_selection_sound.play()
             elif keys[pygame.K_DOWN]:
                 self.selection_index = 3
+                self.change_selection_sound.play()
         elif self.selection_index == 2:
             if keys[pygame.K_UP]:
                 self.selection_index = 0
+                self.change_selection_sound.play()
             elif keys[pygame.K_RIGHT]:
                 self.selection_index = 3
+                self.change_selection_sound.play()
         elif self.selection_index == 3:
             if keys[pygame.K_LEFT]:
                 self.selection_index = 2
+                self.change_selection_sound.play()
             elif keys[pygame.K_UP]:
                 self.selection_index = 1
+                self.change_selection_sound.play()
 
         if keys[pygame.K_SPACE] and self.can_display_new_message and self.player_turn:
+            self.select_sound.play()
             # check if ran away first
             if self.selection_index == 3:
                 self.message_display_time = pygame.time.get_ticks()
@@ -160,6 +177,7 @@ class Battle:
         self.entity_group.draw(self.display_surface)
 
     def update(self):
+        pygame.mixer.music.set_volume(0.5)
         self.display()
         self.input()
         self.cooldowns()

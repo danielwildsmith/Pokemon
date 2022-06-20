@@ -13,7 +13,8 @@ class Entity(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=pos)
 
         self.name = entity_name
-        self.health = entity_data[entity_name]['health']
+        self.max_health = entity_data[entity_name]['health']
+        self.health = self.max_health
         self.damage = entity_data[entity_name]['damage']
         self.moveset = entity_data[entity_name]['moveset']
 
@@ -41,6 +42,8 @@ class Entity(pygame.sprite.Sprite):
 
     def heal(self):
         self.health += self.damage
+        if self.health > self.max_health:
+            self.health = self.max_health
         return f'{self.name} healed itself!'
 
     def cooldowns(self):

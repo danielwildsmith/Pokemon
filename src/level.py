@@ -73,7 +73,7 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.display_surface = pygame.display.get_surface()
         self.half_width = self.display_surface.get_size()[0] // 2
         self.half_height = self.display_surface.get_size()[1] // 2
-        self.offset = pygame.math.Vector2(100, 200)
+        self.offset = pygame.math.Vector2(100, 100)
 
         # creating the map
         self.map_image = pygame.image.load('../graphics/background/Pokemon Town.png')

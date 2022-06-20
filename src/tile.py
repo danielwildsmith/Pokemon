@@ -7,4 +7,4 @@ class Tile(pygame.sprite.Sprite):
         self.sprite_type = sprite_type
         self.wild_area_type = grass_or_water
         self.image = surface
-        self.rect = self.image.get_rect(topleft=pos)
+        self.rect = self.image.get_rect(topleft=(pos[0], pos[1] - TILESIZE / 2))

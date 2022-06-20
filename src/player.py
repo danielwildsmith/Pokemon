@@ -7,7 +7,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load('../graphics/player/down/0.png')
         self.image = pygame.transform.scale(self.image, (90, 90))
         self.rect = self.image.get_rect(center=pos)
-        self.hitbox = self.rect.inflate((-60, -10))
+        self.hitbox = self.rect.inflate((-60, -60))
         self.direction = pygame.math.Vector2()
         self.speed = 5
         self.status = 'down'
